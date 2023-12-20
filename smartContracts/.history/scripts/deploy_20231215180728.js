@@ -12,13 +12,8 @@ async function main() {
 
   // Deploy contract
   console.log("Deploying WizardWealth Contract ...");
-  const initialSupply = BigInt(1000000 * 10 ** 18);
-  const token = await hre.ethers.deployContract("WizardWealth", [
-    initialSupply,
-  ]);
-  await token.waitForDeployment();
-  console.log(`WizardWealth address: ${token.target}`);
-  config.setConfig(network + ".WizardWealth", token.target);
+  const intialSupply = BigInt(10000 * 10 ** 18);
+  const token = await hre.ethers.deployContract("WizardWealth", []);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

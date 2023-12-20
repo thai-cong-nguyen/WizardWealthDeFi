@@ -18,7 +18,7 @@ async function main() {
   ]);
   await token.waitForDeployment();
   console.log(`WizardWealth address: ${token.target}`);
-  config.setConfig(network + ".WizardWealth", token.target);
+  config.setConfig(network + "./WizardWealth");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
