@@ -1,10 +1,14 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 // Components
-import { Card } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
-import proposals from "@/utils/proposal";
+import { Proposal } from "@/utils/proposal";
+import { ChevronRight } from "lucide-react";
+import { Separator } from "../ui/separator";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
+import { Progress } from "../ui/progress";
 
 const renderProposalType = (param: Number) => {
   switch (param) {
@@ -47,47 +51,155 @@ const renderColorProposalStatus = (param: Number) => {
   }
 };
 
-const statusProposal: any = {
-  active: 1,
-  inQueue: 2,
-  passed: 3,
-  failed: 4,
+const formatNumber = new Intl.NumberFormat("en-US", {
+  style: "decimal",
+});
+
+const roundAndFormat = (number: number): number => {
+  return parseInt(formatNumber.format(Math.round(number)));
 };
 
-const ItemProposal = ({ status }: { status: string }) => {
+interface ItemProposalProps {
+  proposal: Proposal;
+}
+
+const ItemProposal = ({ proposal }: ItemProposalProps) => {
+  const VOTING_DURATION = 50400; // 1 week
+  const [totalVotes, setTotalVotes] = useState<number>(100000000);
+  const [forVotes, setForVotes] = useState<number>(80000000);
+  const [againsVotes, setAgainstVotes] = useState<number>(10000000);
+  const [abstainVotes, setAbstainVotes] = useState<number>(10000000);
+  const [minQuorum, setMinQuorum] = useState<number>(1000000000);
+
+  const [approvalProgress, setApprovalProgress] = useState<number>(0);
+
   const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () =>
+        setApprovalProgress(
+          forVotes >= minQuorum ? 100 : (forVotes * 100) / minQuorum
+        ),
+      500
+    );
+    return () => clearTimeout(timer);
+  });
+
   return (
-    <div className="grid grid-cols-2 gap-4">
-      {proposals.map((proposal, index) => {
-        if (proposal.status != statusProposal[status]) return null;
-        return (
-          <Card
-            key={index}
-            className="min-h-[100px] hover:bg-primary/10 cursor-pointer"
-            onClick={() => {
-              router.push(`/governance/proposal/${proposal.id}`);
-            }}
-          >
-            <div className="m-5 flex flex-col gap-2">
-              <div className="flex flex-row gap-4">
-                <div className="flex flex-row gap-2">
-                  <Badge variant={proposal.type == 1 ? "default" : "secondary"}>
-                    {renderProposalType(proposal.type)}
-                  </Badge>
-                  <Badge variant={renderColorProposalStatus(proposal.status)}>
-                    {renderProposalStatus(proposal.status)}
-                  </Badge>
-                </div>
-                <div className="">{proposal.submitDate.toLocaleString()}</div>
+    <Card
+      className="min-h-[100px] hover:bg-primary/10 cursor-pointer transition hover:scale-95 duration-150 delay-75 border-4 border-zinc-950"
+      onClick={() => {
+        router.push(`/governance/proposal/${proposal.id}`);
+      }}
+    >
+      <CardContent>
+        <div className="m-5 flex flex-col gap-5">
+          <div className="flex flex-row items-center justify-between gap-2">
+            <div className="text-2xl font-bold text-secondary-foreground">
+              {proposal.title}
+            </div>
+            <div className="flex flex-row gap-4">
+              <div className="flex flex-row gap-2">
+                <Badge variant={renderColorProposalStatus(proposal.status)}>
+                  {renderProposalStatus(proposal.status)}
+                </Badge>
               </div>
-              <div className="text-xl font-bold text-secondary-foreground">
-                {proposal.title}
+              <ChevronRight className="h-5 w-5" />
+            </div>
+          </div>
+
+          <div className="flex flex-row gap-2 items-center font-medium text-lg">
+            <span>{`Created at:`}</span>
+            <span>{proposal.submitDate.toLocaleString()}</span>
+          </div>
+          <div className="flex flex-row gap-2 items-center font-medium text-lg">
+            <span>{`Ends at:`}</span>
+            {/* <span>{proposal.submitDate.toLocaleString()}</span> */}
+            <div className="flex flex-row gap-2 items-center">
+              <span className="bg-black text-white p-1">{`1d`}</span>
+              <span className="bg-black text-white p-1">{`7h`}</span>
+              <span className="bg-black text-white p-1">{`46m`}</span>
+            </div>
+          </div>
+          <div className="flex flex-row gap-10 items-center justify-between w-full h-full font-bold border-2 p-5 rounded-xl">
+            <div className="flex flex-col gap-2 justify-center w-1/2">
+              <div className="flex flex-row items-center justify-between font-medium text-xl">
+                <span>For Votes</span>
+                <span>Against Votes</span>
+              </div>
+              <div className="flex flex-row items-center justify-between ">
+                <div className="flex flex-row gap-2 items-center">
+                  <span>{formatNumber.format(forVotes)}</span>
+                  <span className="opacity-60">
+                    {formatNumber.format((forVotes * 100) / totalVotes)}%
+                  </span>
+                </div>
+                <div className="flex flex-row gap-2 items-center ">
+                  <span>{formatNumber.format(againsVotes)}</span>
+                  <span className="opacity-60">
+                    {formatNumber.format((againsVotes * 100) / totalVotes)}%
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-row items-center w-full">
+                <div className="w-full h-[20px] relative rounded-xl border-2 overflow-hidden">
+                  <div
+                    className={`h-full float-left bg-emerald-500  absolute top-0 left-0`}
+                    style={{
+                      width: `${formatNumber.format(
+                        (forVotes * 100) / totalVotes
+                      )}%`,
+                    }}
+                  ></div>
+                  <div
+                    className={`h-full float-left bg-gray-500  absolute top-0`}
+                    style={{
+                      width: `${formatNumber.format(
+                        (abstainVotes * 100) / totalVotes
+                      )}%`,
+                      left: `${formatNumber.format(
+                        (forVotes * 100) / totalVotes
+                      )}%`,
+                      right: `${formatNumber.format(
+                        (againsVotes * 100) / totalVotes
+                      )}%`,
+                    }}
+                  ></div>
+                  <div
+                    className={`h-full float-left bg-red-600  absolute top-0 right-0`}
+                    style={{
+                      width: `${formatNumber.format(
+                        (againsVotes * 100) / totalVotes
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
               </div>
             </div>
-          </Card>
-        );
-      })}
-    </div>
+            <Separator
+              orientation="horizontal"
+              className="w-[1px] h-20 bg-slate-600 shrink"
+            />
+            <div className="flex flex-col gap-2 justify-center w-1/2">
+              <div className="flex flex-row gap-2 items-center  font-medium text-xl">
+                <span>Approval Quorum</span>
+                <InfoCircledIcon className="h-4 w-4" />
+              </div>
+              <span>
+                {formatNumber.format(
+                  minQuorum - forVotes >= 0 ? minQuorum - forVotes : 0
+                )}{" "}
+                more Yes votes required
+              </span>
+              <div className="flex flex-row items-center w-full">
+                <Progress value={approvalProgress} className="w-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

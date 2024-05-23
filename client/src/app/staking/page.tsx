@@ -1,5 +1,9 @@
 import StakingDashboard from "@/components/staking/stakingDashboard";
+import { wagmiConfig } from "@/config/Wagmi.config";
 import React from "react";
+import { useReadContracts, useChainId } from "wagmi";
+import { getStakingAbi } from "@/contracts/utils/getAbis";
+import { getStakingAddress } from "@/contracts/utils/getAddress";
 
 const Staking = () => {
   return (

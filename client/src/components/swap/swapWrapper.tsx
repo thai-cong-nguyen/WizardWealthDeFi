@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import SwapSection from "./swap/swapSection";
 import ArrowWrapper from "./swap/arrowWrapper";
-import SwapButton from "./executingButton";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import AddressSection from "./send/addressSection";
 // Hooks
 import useSwapToken from "@/hooks/swap/useSwapToken";
 // Utils
-import { tokens } from "@/utils/tokens";
+import { defaultTokens } from "@/utils/tokens";
 // Models
 import { TokenModel } from "@/models/Token.Models";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -31,21 +31,26 @@ import {
 import { Switch } from "../ui/switch";
 import useAmountSwapToken from "@/hooks/swap/useAmountSwapToken";
 import useSendToken from "@/hooks/swap/useSendToken";
+import { useChainId, useReadContract } from "wagmi";
+import { getSwapAbi } from "@/contracts/utils/getAbis";
+import {
+  getFactoryAddress,
+  getSwapAddress,
+} from "@/contracts/utils/getAddress";
+
+type Reserves = [BigInt, BigInt];
 
 const SwapWrapper = () => {
-  const defaultToken: TokenModel = tokens[0];
+  const defaultToken: TokenModel = defaultTokens[0];
   const defaultAmount: number | undefined = undefined;
-  const defaultSlippage = 0.5;
+  const defaultSlippage = 1;
   const maxSlippage = 50;
-  const minSlippage = 0.05;
-  const ratio = 2;
+  const minSlippage = 1;
   const defaultDeadline = 10;
   const minDeadline = 1;
   const maxDeadline = 4320; // 72 hours = 3 days
 
-  const [isSwap, setIsSwap] = useState<boolean>(true);
-
-  // Swap Section
+  const chain = useChainId();
   const { token: inToken, handleSwapTokenChange: handleSetInToken } =
     useSwapToken({ defaultToken: defaultToken });
   const { token: outToken, handleSwapTokenChange: handleSetOutToken } =
@@ -55,9 +60,41 @@ const SwapWrapper = () => {
     handleAmountChange: handleSetInTokenAmountChange,
   } = useAmountSwapToken({ defaultAmount });
   const {
-    amount: amountOutToken,
-    handleAmountChange: handleSetOutTokenAmountChange,
-  } = useAmountSwapToken({ defaultAmount });
+    data: reserve,
+    error: reserveError,
+    isPending: reserveIsPending,
+  } = useReadContract({
+    abi: getSwapAbi(),
+    address: getSwapAddress(chain),
+    functionName: "getReserves",
+    args: [getFactoryAddress(chain), inToken?.address, outToken?.address],
+    query: {
+      notifyOnChangeProps: ["data", "error"],
+    },
+  });
+  const [reserve1, reserve2] = !reserveError
+    ? (reserve as Reserves) || [0, 0]
+    : [0, 0];
+  const {
+    data: amountOutToken,
+    error: amountOutError,
+    isPending: amountOutIsPending,
+  } = useReadContract({
+    abi: getSwapAbi(),
+    address: getSwapAddress(chain),
+    functionName: "getAmountOut",
+    args: [
+      ethers.parseEther(amountInToken ? amountInToken.toString() : "0"),
+      reserve1,
+      reserve2,
+    ],
+    query: {
+      notifyOnChangeProps: ["data", "error"],
+    },
+  });
+  const [isSwap, setIsSwap] = useState<boolean>(true);
+
+  // Swap Section
 
   const [slippage, setSlippage] = useState<number>(defaultSlippage);
   const [isAutoSlippage, setIsAutoSlippage] = useState<boolean | undefined>(
@@ -67,24 +104,11 @@ const SwapWrapper = () => {
 
   // Send Section
   const { token: sendToken, handleSendTokenChange: handleSendToken } =
-    useSendToken({ defaultToken: tokens[0] });
-  const [address, setAddress] = useState<string | undefined>(undefined);
+    useSendToken({ defaultToken: defaultTokens[0] });
+  const [address, setAddress] = useState<`0x${string}` | undefined>(undefined);
   const [sendAmount, setSendAmount] = useState<number>(0);
 
-  //
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(true);
-
-  const fetchPrices = (inToken: TokenModel, outToken: TokenModel): Number => {
-    return 2;
-  };
-
-  useEffect(() => {
-    if (inToken && outToken && amountInToken) {
-      const reCalculatedAmount = amountInToken * ratio;
-      handleSetOutTokenAmountChange(reCalculatedAmount);
-    }
-    console.log(amountInToken);
-  }, [amountInToken, inToken, outToken, handleSetOutTokenAmountChange]);
 
   const handleChangeTab = (isSwap: boolean) => {
     setIsSwap(isSwap);
@@ -92,9 +116,6 @@ const SwapWrapper = () => {
 
   const handleSwapInTokenAmountChange = (amount: number) => {
     handleSetInTokenAmountChange(amount);
-  };
-  const handleSwapOutTokenAmountChange = (amount: number) => {
-    handleSetOutTokenAmountChange(amount);
   };
 
   const handleSwapInTokenChange = (newToken: TokenModel | undefined) => {
@@ -120,7 +141,7 @@ const SwapWrapper = () => {
     const tempToken = inToken;
     handleSetInToken(outToken);
     handleSetOutToken(tempToken);
-    handleSetInTokenAmountChange(amountOutToken);
+    // handleSetInTokenAmountChange(amountOutToken);
   };
 
   const handleChangeSlippageMode = () => {
@@ -130,7 +151,7 @@ const SwapWrapper = () => {
     }
   };
 
-  const handleChangeAddress = (newAddress: string | undefined) => {
+  const handleChangeAddress = (newAddress: `0x${string}` | undefined) => {
     setAddress(newAddress);
   };
 
@@ -141,10 +162,6 @@ const SwapWrapper = () => {
   const handleChangeSendToken = (newToken: TokenModel | undefined) => {
     handleSendToken(newToken);
   };
-
-  useEffect(() => {
-    console.log(isSwap);
-  }, [isSwap]);
 
   return (
     <main className="flex flex-col w-[500px] h-auto relative">
@@ -213,7 +230,7 @@ const SwapWrapper = () => {
                         <div className="w-full h-full flex flex-row justify-center items-center space-x-2">
                           <Input
                             className="text-right"
-                            step={0.01}
+                            step={1}
                             type="number"
                             min={minSlippage}
                             max={maxSlippage}
@@ -295,12 +312,19 @@ const SwapWrapper = () => {
             <ArrowWrapper onClick={handleSwapTokenPosition} />
             <SwapSection
               isInToken={false}
-              onChangeAmount={(amountOut) => {
-                handleSwapOutTokenAmountChange(amountOut);
-              }}
               onChangeToken={(newToken) => handleSwapOutTokenChange(newToken)}
               token={outToken}
-              amount={amountOutToken}
+              amount={
+                ((!amountOutError
+                  ? amountOutToken
+                    ? parseFloat(ethers.formatEther(amountOutToken.toString()))
+                    : 0
+                  : 0) *
+                  (100 - slippage)) /
+                100
+              }
+              isPending={amountOutIsPending || reserveIsPending}
+              error={amountOutError && (amountOutError as any)}
             />
           </div>
         </TabsContent>
@@ -322,19 +346,18 @@ const SwapWrapper = () => {
       <ExecutingButton
         className="xl-h-auto md-h-[100px] h-[65px] text-xl"
         isSwap={isSwap}
-        onClickHandler={() => {
-          console.log(
-            inToken ? inToken.symbol : inToken,
-            outToken ? outToken.symbol : outToken
-          );
-        }}
+        onClickHandler={() => {}}
         amountInToken={amountInToken}
         amountOutToken={amountOutToken}
+        deadline={deadline}
         inToken={inToken}
         outToken={outToken}
         sendToken={sendToken}
         sendAmount={sendAmount}
         address={address}
+        swapError={amountOutError as any}
+        isSwapPending={amountOutIsPending || reserveIsPending}
+        slippage={slippage}
       />
     </main>
   );

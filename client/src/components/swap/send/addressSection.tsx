@@ -3,7 +3,7 @@ import React from "react";
 
 interface SendSectionProps {
   address?: string | undefined;
-  onChangeAddress: (address: string | undefined) => void;
+  onChangeAddress: (address: `0x${string}` | undefined) => void;
 }
 
 const AddressSection: React.FC<SendSectionProps> = ({
@@ -15,7 +15,7 @@ const AddressSection: React.FC<SendSectionProps> = ({
   };
   return (
     <div className="flex flex-col justify-center bg-fuchsia-100 bg-opacity-60 rounded-md h-auto py-5 gap-2">
-      <span className="px-5 text-lg">To</span>
+      <span className="px-5 text-lg font-bold">To</span>
       <div className="w-full px-2">
         <Input
           placeholder="Wallet address or ENS name"

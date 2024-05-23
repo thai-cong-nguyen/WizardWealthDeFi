@@ -1,14 +1,10 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 //Components
 import { Button } from "../ui/button";
 
-import {
-  ConnectButton,
-  useConnectModal,
-  useAccountModal,
-  useChainModal,
-} from "@rainbow-me/rainbowkit";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 import {
   Dialog,
@@ -19,30 +15,42 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { TokenModel } from "@/models/Token.Models";
-import { set, z } from "zod";
-import { useContractWrite } from "wagmi";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+  type BaseError,
+  useAccount,
+  useSendTransaction,
+} from "wagmi";
+import { getSwapAbi, getWETHAbi } from "@/contracts/utils/getAbis";
+import { useToast } from "../ui/use-toast";
+import { getSwapAddress, getWETHAddress } from "@/contracts/utils/getAddress";
+import { ethers } from "ethers";
+import Link from "next/link";
 
 interface ExecutingButtonProps {
   className: string;
   isSwap: boolean;
   onClickHandler: any;
   amountInToken?: number;
-  amountOutToken?: number;
+  amountOutToken?: any;
   isAutoSlippage?: boolean;
-  slippage?: number;
+  slippage: number;
   inToken?: TokenModel;
   outToken?: TokenModel;
   sendToken?: TokenModel;
   sendAmount?: number;
-  address?: string;
+  address?: `0x${string}`;
+  swapError?: BaseError | null;
+  isSwapPending: boolean;
+  deadline: number;
 }
 
 const ExecutingButton: React.FC<ExecutingButtonProps> = ({
   className,
-  isSwap,
+  isSwap, // Swap or Send Tabs
   onClickHandler,
   amountInToken,
   amountOutToken,
@@ -53,12 +61,147 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
   sendToken,
   sendAmount,
   address,
+  swapError,
+  isSwapPending,
+  deadline,
 }) => {
-  // const {data: hash, writeContract} = useContractWrite
+  const chainId = useChainId();
+  const account = useAccount();
+  // Swap
+  const {
+    data: hash,
+    error: executingError,
+    isPending: isPendingTransaction,
+    writeContract,
+  } = useWriteContract();
+
+  // Send
+  const {
+    data: hashSendTransaction,
+    error: sendTransactionError,
+    isPending: isPendingSendTransaction,
+    sendTransaction,
+  } = useSendTransaction();
+
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    isError: isReverted,
+  } = useWaitForTransactionReceipt({
+    hash: isSwap ? hash : hashSendTransaction,
+  });
+
+  const { toast } = useToast();
   const [isOpenDialog, setIsOpenDialog] = useState(false);
+  const [isOpenLoadingDialog, setIsOpenLoadingDialog] = useState(false);
+  const percentage = BigInt(100 - slippage);
+  const amountOutMin = (BigInt(amountOutToken || 0) * percentage) / BigInt(100);
 
   const handleReviewClick = (openDialog: boolean) => {
     setIsOpenDialog(openDialog);
+  };
+
+  useEffect(() => {
+    setIsOpenLoadingDialog(isConfirming || isConfirmed || isReverted);
+    if (isConfirming) {
+      setIsOpenDialog(false);
+    }
+  }, [isConfirming, isConfirmed, isReverted]);
+
+  const submitTransaction = async () => {
+    let functionName = "",
+      address,
+      abi: any[] = [],
+      args: any[] = [],
+      value;
+    if (isSwap) {
+      functionName =
+        inToken?.native == true && outToken?.address == getWETHAddress(chainId)
+          ? "deposit"
+          : outToken?.native == true &&
+            inToken?.address == getWETHAddress(chainId)
+          ? "withdraw"
+          : inToken?.native
+          ? "swapExactETHForTokens"
+          : outToken?.native
+          ? "swapExactTokensForETH"
+          : "swapExactTokensForTokens";
+      abi =
+        inToken?.native == true && outToken?.address == getWETHAddress(chainId)
+          ? getWETHAbi()
+          : outToken?.native == true &&
+            inToken?.address == getWETHAddress(chainId)
+          ? getWETHAbi()
+          : getSwapAbi();
+      address =
+        inToken?.native == true && outToken?.address == getWETHAddress(chainId)
+          ? getWETHAddress(chainId)
+          : outToken?.native == true &&
+            inToken?.address == getWETHAddress(chainId)
+          ? getWETHAddress(chainId)
+          : getSwapAddress(chainId);
+      args =
+        inToken?.native == true && outToken?.address == getWETHAddress(chainId)
+          ? []
+          : outToken?.native == true &&
+            inToken?.address == getWETHAddress(chainId)
+          ? [ethers.parseEther(amountInToken ? amountInToken.toString() : "0")]
+          : inToken?.native
+          ? [
+              outToken?.address,
+              amountOutMin,
+              account.address,
+              Date.now() + deadline * 60 * 1000,
+            ]
+          : outToken?.native
+          ? [
+              inToken?.address,
+              ethers.parseEther(amountInToken ? amountInToken.toString() : "0"),
+              amountOutMin,
+              account.address,
+              Date.now() + deadline * 60 * 1000,
+            ]
+          : [
+              inToken?.address,
+              outToken?.address,
+              ethers.parseEther(amountInToken ? amountInToken.toString() : "0"),
+              amountOutMin,
+              account.address,
+              Date.now() + deadline * 60 * 1000,
+            ];
+      value =
+        (inToken?.native == true &&
+          outToken?.address == getWETHAddress(chainId)) ||
+        inToken?.native
+          ? ethers.parseEther(amountInToken ? amountInToken.toString() : "0")
+          : ethers.parseEther("0");
+    }
+    console.log({
+      address,
+      abi,
+      args,
+      functionName,
+      value,
+    });
+    writeContract({
+      address,
+      abi,
+      args,
+      functionName,
+      value,
+    });
+  };
+  console.log(executingError);
+
+  const sendTransactionSubmit = async () => {
+    if (sendToken?.native && address) {
+      sendTransaction({
+        to: address,
+        value: ethers.parseEther(sendAmount ? sendAmount.toString() : "0"),
+      });
+    } else {
+      console.log("Continue...");
+    }
   };
 
   return (
@@ -135,7 +278,7 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                 }
 
                 if (isSwap) {
-                  if (!outToken) {
+                  if (!outToken || !inToken) {
                     return (
                       <Button
                         type="button"
@@ -146,7 +289,7 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                       </Button>
                     );
                   }
-                  if (!amountInToken || !amountOutToken) {
+                  if (!amountInToken) {
                     return (
                       <Button
                         type="button"
@@ -154,6 +297,28 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                         className={` ${className} w-full mt-2`}
                       >
                         Input Amount
+                      </Button>
+                    );
+                  }
+                  if (swapError) {
+                    return (
+                      <Button
+                        type="button"
+                        disabled={true}
+                        className={` ${className} w-full mt-2`}
+                      >
+                        {swapError && swapError.shortMessage.split(": ")[1]}
+                      </Button>
+                    );
+                  }
+                  if (isSwapPending) {
+                    return (
+                      <Button
+                        type="button"
+                        disabled={true}
+                        className={` ${className} w-full mt-2`}
+                      >
+                        Pending...
                       </Button>
                     );
                   }
@@ -230,7 +395,7 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                   width={40}
                   height={40}
                   src="/ethereum.png"
-                  alt={inToken ? inToken.symbol : ""}
+                  alt={inToken?.symbol ? inToken.symbol : ""}
                 />
               </div>
               <div className="flex flex-row justify-between items-center">
@@ -239,7 +404,15 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                     You receive
                   </span>
                   <div className="flex flex-row gap-3 items-center text-lg ">
-                    <span className="font-bold">{amountOutToken}</span>
+                    <span className="font-bold">
+                      {((amountOutToken
+                        ? parseFloat(
+                            ethers.formatEther(amountOutToken.toString())
+                          )
+                        : 0) *
+                        (100 - slippage)) /
+                        100}
+                    </span>
                     <span>{outToken ? outToken.symbol : ""}</span>
                   </div>
                 </div>
@@ -263,52 +436,105 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                 </div>
                 <div className="flex flex-row justify-between items-center">
                   <span>Max slippage</span>
-                  <span>{`${0.5} %`}</span>
+                  <span>{`${slippage} %`}</span>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                   <span>Fee</span>
                   <span>{`${0} $`}</span>
                 </div>
               </div>
-              <Button className="w-full" type="submit" onClick={async () => {}}>
-                {isSwap ? "Confirm swap" : "Confirm Send"}
+              <Button
+                className="w-full"
+                type="submit"
+                onClick={submitTransaction}
+                disabled={isPendingTransaction}
+              >
+                {isPendingTransaction
+                  ? "Transaction Pending..."
+                  : "Confirm swap"}
               </Button>
             </div>
           ) : (
             <div className="flex flex-col gap-5 mt-3">
               <div className="flex flex-row justify-between items-center">
-                <div className="flex flex-col gap-1 justify-center">
+                <div className="flex flex-col gap-1 justify-center w-full">
                   <span className="text-base font-semibold opacity-50">
-                    You're sending
+                    {`You're sending`}
                   </span>
-                  <div className="flex flex-row gap-3 items-center text-lg">
+                  <div className="flex flex-row gap-3 items-center justify-between w-full text-lg">
                     <span className="font-bold">{sendAmount}</span>
-                    <span>{sendToken ? sendToken.symbol : ""}</span>
+                    <div className="flex flex-row items-center gap-1">
+                      <Image
+                        width={40}
+                        height={40}
+                        src="/ethereum.png"
+                        alt={sendToken ? sendToken.symbol : ""}
+                      />
+                      <span>{sendToken ? sendToken.symbol : ""}</span>
+                    </div>
                   </div>
                 </div>
-                <Image
-                  width={40}
-                  height={40}
-                  src="/ethereum.png"
-                  alt={sendToken ? sendToken.symbol : ""}
-                />
               </div>
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-col gap-1 justify-center">
                   <span className="text-base font-semibold opacity-50">To</span>
                   <div className="flex flex-row gap-3 items-center text-lg ">
-                    <span className="font-bold text-2xl">{address}</span>
+                    <span className="font-bold">{address}</span>
                   </div>
                 </div>
               </div>
               <Button
                 className="w-full text-xl h-[50px]"
+                onClick={sendTransactionSubmit}
+                disabled={isPendingSendTransaction}
                 type="submit"
-                onClick={async () => {}}
               >
-                {isSwap ? "Confirm swap" : "Confirm Send"}
+                {isPendingSendTransaction
+                  ? "Transaction Pending..."
+                  : "Confirm send"}
               </Button>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isOpenLoadingDialog} onOpenChange={setIsOpenLoadingDialog}>
+        <DialogContent>
+          {isConfirming ? (
+            <div className="flex flex-col gap-5 mt-3 justify-center items-center gap-2">
+              <span>Waiting for confirmation...</span>
+            </div>
+          ) : isConfirmed ? (
+            <div className="flex flex-col gap-5 mt-3 justify-center items-center gap-2">
+              <Button className="w-full" type="submit">
+                <Link
+                  href={`https://sepolia.etherscan.io/tx/${
+                    isSwap ? hash : hashSendTransaction
+                  }`}
+                  target="_blank"
+                >
+                  Transaction
+                </Link>
+              </Button>
+              {isConfirmed && <span>Transaction confirmed.</span>}
+            </div>
+          ) : isReverted ? (
+            <div className="flex flex-col gap-5 mt-3 justify-center items-center gap-2">
+              <Button className="w-full" type="submit">
+                <Link
+                  href={`https://sepolia.etherscan.io/tx/${hash}`}
+                  target="_blank"
+                >
+                  Transaction
+                </Link>
+              </Button>
+              {error && (
+                <div>
+                  Error: {(error as BaseError).shortMessage || error.message}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div></div>
           )}
         </DialogContent>
       </Dialog>

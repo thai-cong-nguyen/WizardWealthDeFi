@@ -8,6 +8,8 @@ import Header from "@/components/Header";
 // Provider
 import Providers from "./providers";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,11 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
-          <Header />
-          {children}
-          <Footer />
-        </Providers>
+        <AppRouterCacheProvider>
+          <Providers>
+            <Header />
+            <main>{children}</main>
+            <Toaster duration={Infinity} />
+            {/* <Footer /> */}
+          </Providers>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

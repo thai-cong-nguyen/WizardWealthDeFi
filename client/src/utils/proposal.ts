@@ -1,6 +1,18 @@
+export type Proposal = {
+  id: number;
+  title: string;
+  description: string;
+  status: number;
+  initialDeposit: number;
+  type: number;
+  totalVotes: number;
+  owner: string;
+  submitDate: Date;
+}
+
 // Type - 1: Text Proposal - 2: New Gauge Proposal
 // Status - 1: Active (just created)- 2: Passed - 3: In Queue - 4: Canceled
-const proposals: any[] = [
+export const proposals: Proposal[] = [
     {
       id: 1,
       title: "Title Proposal 1",
@@ -60,5 +72,3 @@ const proposals: any[] = [
       submitDate: new Date(),
     },
   ];
-
-export default proposals;

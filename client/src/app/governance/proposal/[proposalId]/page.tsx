@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowBigLeft, AlertCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import Votes from "@/components/governance/votes";
-import proposals from "@/utils/proposal";
+import {proposals} from "@/utils/proposal";
 import VoteDialog from "@/components/governance/voteDialog";
 
 const ProposalDetail = ({ params }: { params: { proposalId: string } }) => {

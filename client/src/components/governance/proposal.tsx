@@ -9,12 +9,13 @@ import Order from "./order";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import ItemProposal from "./itemProposal";
+import ListProposal from "./listProposal";
 
 const Proposal = () => {
-  const [status, setStatus] = useState("active");
+  const [status, setStatus] = useState<string>("active");
+  const [search, setSearch] = useState<string>("");
   return (
-    <div className="flex justify-center items-center flex-col">
+    <div className="flex flex-col items-center my-5 w-[1400px] min-h-[900px] bg-white border-2 rounded-xl py-10">
       {/* title */}
       <div className="flex flex-col gap-5 justify-center items-center">
         <span className="text-3xl font-bold">
@@ -67,9 +68,16 @@ const Proposal = () => {
               <Order />
             </div>
           </div>
-          <Input type="text" placeholder="Search proposals" />
+          <Input
+            type="text"
+            placeholder="Search proposals"
+            onChange={(event: any) => {
+              setSearch(event.target.value);
+              console.log(event.target.value);
+            }}
+          />
           <TabsContent value={status}>
-            <ItemProposal status={status} />
+            <ListProposal status={status} search={search} />
           </TabsContent>
         </Tabs>
       </div>
