@@ -71,7 +71,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
               width={50}
               height={50}
               src="/ethereum.png"
-              alt={token.name}
+              alt={token.name || ""}
             />
           </div>
           <div className="flex flex-col justify-center items-center ">
@@ -118,7 +118,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
                     width={50}
                     height={50}
                     src="/ethereum.png"
-                    alt={token.name}
+                    alt={token.name || ""}
                   />
                   <span className="text-2xl">Stake {token.symbol}</span>
                 </>
@@ -135,7 +135,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
                           width={50}
                           height={50}
                           src="/ethereum.png"
-                          alt={token.name}
+                          alt={token.name || ""}
                         />
                         <span className="font-bold text-xl">
                           {token.symbol}
@@ -268,7 +268,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
                     width={50}
                     height={50}
                     src="/ethereum.png"
-                    alt={token.name}
+                    alt={token.name || ""}
                   />
                   <span className="text-2xl">Withdraw {token.symbol}</span>
                 </>
@@ -285,7 +285,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
                           width={50}
                           height={50}
                           src="/ethereum.png"
-                          alt={token.name}
+                          alt={token.name || ""}
                         />
                         <span className="font-bold text-xl">
                           {token.symbol}
@@ -384,7 +384,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
                       onClick={() => {
                         console.log(
                           !withdrawChecked &&
-                            MIN_WITHDRAW_TOKEN > withdrawAmount
+                          MIN_WITHDRAW_TOKEN > withdrawAmount
                         );
                       }}
                     >
@@ -414,7 +414,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
                     width={50}
                     height={50}
                     src="/ethereum.png"
-                    alt={token.name}
+                    alt={token.name || ""}
                   />
                   <span className="text-2xl">Earn {token.symbol}</span>
                 </>
@@ -431,7 +431,7 @@ const LineStaking = ({ value, token }: LineStakingProps) => {
                           width={50}
                           height={50}
                           src="/ethereum.png"
-                          alt={token.name}
+                          alt={token.name || ""}
                         />
                         <span className="font-bold text-xl">
                           {token.symbol}

@@ -119,7 +119,7 @@ const SendSection: React.FC<SendSectionProps> = ({
                   width={45}
                   height={45}
                   src="/ethereum.png"
-                  alt={sendToken ? sendToken?.symbol : ""}
+                  alt={sendToken?.symbol || ""}
                 />
                 <span>{sendToken ? sendToken?.symbol : ""}</span>
               </div>
@@ -158,7 +158,7 @@ const SendSection: React.FC<SendSectionProps> = ({
                         width={30}
                         height={30}
                         src="/ethereum.png"
-                        alt={token ? token?.symbol : ""}
+                        alt={token?.symbol || ""}
                       />
                       <span>{token ? token?.symbol : ""}</span>
                     </Button>

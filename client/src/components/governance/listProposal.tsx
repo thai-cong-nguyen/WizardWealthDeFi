@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 // Components
-import { proposals } from "@/utils/proposal";
 import ItemProposal from "./itemProposal";
 import { useChainId, useReadContract, useReadContracts, useWatchContractEvent } from "wagmi";
 import { getGovernorAddress } from "@/contracts/utils/getAddress";
