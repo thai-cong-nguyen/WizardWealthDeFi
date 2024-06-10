@@ -17,15 +17,14 @@ import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt,
 import LoadingTransactionHash from '@/components/LoadingTransactionHash';
 import { getGovernorAbi, getWizardWealthAbi } from "@/contracts/utils/getAbis";
 import { getGovernorAddress, getWizardWealthAddress } from "@/contracts/utils/getAddress";
-import { ethers } from 'ethers';
 
-interface ExecutingButtonProps {
+interface CancelButtonProps {
     proposalDetail: any;
     proposalId: any;
 }
 
 
-const ExecutingButton = ({ proposalDetail, proposalId }: ExecutingButtonProps) => {
+const CancelButton = ({ proposalDetail, proposalId }: CancelButtonProps) => {
     const account = useAccount();
     const chain = useChainId();
     const [loadingDialogIsOpen, setLoadingDialogIsOpen] = useState(false);
@@ -45,28 +44,28 @@ const ExecutingButton = ({ proposalDetail, proposalId }: ExecutingButtonProps) =
     });
 
     const {
-        data: executingHash,
-        isPending: executingIsPending,
-        isError: executingIsError,
-        error: executingError,
-        writeContract: executingWriteContract,
+        data: cancelHash,
+        isPending: cancelIsPending,
+        isError: cancelIsError,
+        error: cancelError,
+        writeContract: cancelWriteContract,
     } = useWriteContract();
 
     const {
-        isLoading: executingIsConfirming,
-        isSuccess: executingIsConfirmed,
-        isError: executingIsReverted,
-    } = useWaitForTransactionReceipt({ confirmations: 2, hash: executingHash });
+        isLoading: cancelIsConfirming,
+        isSuccess: cancelIsConfirmed,
+        isError: cancelIsReverted,
+    } = useWaitForTransactionReceipt({ confirmations: 2, hash: cancelHash });
 
-    const executingSubmit = () => {
-        executingWriteContract({
+    const cancelSubmit = () => {
+        cancelWriteContract({
             ...governorContract,
-            functionName: "execute",
-            args: [(proposalData as any[])[0], (proposalData as any[])[1], (proposalData as any[])[2], (proposalData as any[])[3]],
-            value: ethers.parseEther("0.01"),
+            functionName: "cancel",
+            args: [proposalId],
         });
     }
 
+    console.log(cancelError)
 
     return (
         <div className="">
@@ -149,18 +148,18 @@ const ExecutingButton = ({ proposalDetail, proposalId }: ExecutingButtonProps) =
                                         return (
                                             <Button
                                                 disabled={
-                                                    executingIsPending
+                                                    cancelIsPending
                                                 }
                                                 type="submit"
-                                                className={`bg-cyan-600 hover:scale-90 transition delay-150 duration-400`}
+                                                className={`bg-red-600 hover:scale-90 transition delay-150 duration-400`}
                                                 onClick={() => {
                                                     setLoadingDialogIsOpen(true);
-                                                    executingSubmit();
+                                                    cancelSubmit();
                                                 }}
                                             >
-                                                {executingIsPending
+                                                {cancelIsPending
                                                     ? "Confirming..."
-                                                    : `Execute`}
+                                                    : `Cancel`}
                                             </Button>
                                         );
                                     })()}
@@ -172,7 +171,7 @@ const ExecutingButton = ({ proposalDetail, proposalId }: ExecutingButtonProps) =
                 <DialogContent>
                     <DialogHeader>Transaction Detail: </DialogHeader>
                     {
-                        (executingIsPending || executingIsError || executingIsConfirming || executingIsConfirmed || executingIsReverted) && <LoadingTransactionHash type="Executing this proposal" isConfirmed={executingIsConfirming} isReverted={executingIsReverted} isError={executingIsError} hash={executingHash} className="flex flex-col gap-1 justify-center items-center" />
+                        (cancelIsPending || cancelIsError || cancelIsConfirming || cancelIsConfirmed || cancelIsReverted) && <LoadingTransactionHash type="Queuing this proposal" isConfirmed={cancelIsConfirming} isReverted={cancelIsReverted} isError={cancelIsError} hash={cancelHash} className="flex flex-col gap-1 justify-center items-center" />
                     }
                 </DialogContent>
             </Dialog>
@@ -180,4 +179,4 @@ const ExecutingButton = ({ proposalDetail, proposalId }: ExecutingButtonProps) =
     )
 }
 
-export default ExecutingButton
+export default CancelButton

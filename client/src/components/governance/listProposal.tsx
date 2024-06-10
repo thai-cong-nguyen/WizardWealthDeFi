@@ -16,6 +16,7 @@ const statusProposal: any = {
   succeeded: 4,
   queued: 5,
   expired: 6,
+  executed: 7,
 };
 
 interface ListProposal {

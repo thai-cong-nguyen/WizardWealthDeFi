@@ -11,19 +11,6 @@ export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 const infuraApiKey = process.env.NEXT_PUBLIC_INFURA_API_KEY;
 const appName = 'Wizard Wealth DAO';
 
-// Create wagmiConfig
-
-// export const config = createConfig({
-//   chains: [
-//     // mainnet, 
-//     sepolia
-//   ],
-//   transports: {
-//     // [mainnet.id]: http(`https://mainnet.infura.io/v3/${infuraApiKey}`),
-//     [sepolia.id]: http(`https://sepolia.infura.io/v3/${infuraApiKey}`),
-//   },
-// })
-
 export const wagmiConfig = getDefaultConfig({
   appName: appName,
   projectId: projectId ? projectId : "",
@@ -36,6 +23,6 @@ export const wagmiConfig = getDefaultConfig({
     [sepolia.id]: http(`https://sepolia.infura.io/v3/${infuraApiKey}`),
   },
   storage: createStorage({
-    storage: cookieStorage
+    storage: localStorage,
   }),
 })
