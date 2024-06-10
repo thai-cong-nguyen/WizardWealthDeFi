@@ -12,3 +12,4 @@ export const getGovernorAddress = (chainId: any) => getAddress(SMART_CONTRACT_AD
 
 export const getWETHAddress = (chainId: any) => getAddress(SMART_CONTRACT_ADDRESS.WETH, chainId);
 export const getFactoryAddress = (chainId: any) => getAddress(SMART_CONTRACT_ADDRESS.Factory, chainId);
+export const getBoxTestAddress = (chainId: any) => getAddress(SMART_CONTRACT_ADDRESS.BoxTest, chainId);

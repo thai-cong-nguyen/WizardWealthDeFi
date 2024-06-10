@@ -30,7 +30,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
-import { wagmiConfig, config } from "@/config/Wagmi.config";
+import { wagmiConfig } from "@/config/Wagmi.config";
 import { bigint } from "zod";
 import InputDialog from "./inputDialog";
 import { toast } from "sonner";
@@ -46,6 +46,7 @@ const timeStampToDays = (timeStamp: any) => {
 
 const ContentDashboard = ({ props }: ContentDashboardProps) => {
   const chain = useChainId();
+
   const stakingContract = {
     address: getStakingAddress(chain),
     abi: getStakingAbi(),
@@ -63,7 +64,7 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
     error: readDataError,
     isPending: readDataIsPending,
   } = useReadContracts({
-    config: config,
+    config: wagmiConfig,
     contracts: [
       {
         ...stakingContract,
@@ -217,32 +218,32 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
 
   const stakingBalance: any = account
     ? parseFloat(
-        ethers.formatEther(
-          userIsSuccess && userData[0].status == "success"
-            ? (userData?.[0].result as any)
-            : (0 as any)
-        )
-      ).toFixed(5)
+      ethers.formatEther(
+        userIsSuccess && userData[0].status == "success"
+          ? (userData?.[0].result as any)
+          : (0 as any)
+      )
+    ).toFixed(5)
     : 0;
 
   const rewardBalance: any = account
     ? parseFloat(
-        ethers.formatEther(
-          userIsSuccess && userData[1].status == "success"
-            ? (userData?.[1].result as any)
-            : (0 as any)
-        )
-      ).toFixed(5)
+      ethers.formatEther(
+        userIsSuccess && userData[1].status == "success"
+          ? (userData?.[1].result as any)
+          : (0 as any)
+      )
+    ).toFixed(5)
     : 0;
 
   const tokenBalance: any = account
     ? parseFloat(
-        ethers.formatEther(
-          userIsSuccess && userData[2].status == "success"
-            ? (userData?.[2].result as any)
-            : (0 as any)
-        )
-      ).toFixed(5)
+      ethers.formatEther(
+        userIsSuccess && userData[2].status == "success"
+          ? (userData?.[2].result as any)
+          : (0 as any)
+      )
+    ).toFixed(5)
     : 0;
 
   const approvalSubmit = () => {
@@ -271,14 +272,6 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
       args: [ethers.parseEther(unStakeAmount.toString())],
     });
   };
-
-  console.log(
-    earnIsError,
-    earnIsPending,
-    earnStakeIsConfirming,
-    earnStakeIsConfirmed,
-    earnStakeIsReverted
-  );
 
   const earnSubmit = () => {
     earnWriteContract({
@@ -393,29 +386,6 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
         </div>
       </div>
       <div className="flex flex-row gap-2 rounded-md items-center justify-between">
-        {/* <div className="flex flex-col justify-center gap-3 bg-white bg-opacity-60 border-2 border-black rounded-md h-[150px] p-5">
-          <Label className="text-lg">Input amount</Label>
-          <div className="flex flex-row justify-between">
-            <Input
-              className={`border-none bg-transparent p-0 outline-none text-2xl focus-visible:ring-0 focus-visible:ring-offset-0 -webkit-appearance-none`}
-              type="number"
-              inputMode="decimal"
-              placeholder="0"
-              value={undefined}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {}}
-            />
-          </div>
-          <div className="flex flex-row items-center justify-end h-[100px]">
-            <div className="flex flex-row items-center justify-end gap-1 font-bold text-sm ">
-              <span>Balance:</span>
-              <span className="opacity-70">{`${parseFloat(
-                ethers.formatEther(
-                  (balance.data ? balance.data.value : 0).toString()
-                )
-              ).toFixed(5)}`}</span>
-            </div>
-          </div>
-        </div> */}
         <div className="flex flex-col gap-2 justify-center h-[100px]">
           <Dialog>
             <DialogTrigger asChild>
@@ -458,13 +428,13 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
                     <Button
                       disabled={
                         stakeIsPending ||
-                        stakeAmount <= 0 ||
-                        !approvalIsConfirmed
+                        stakeAmount <= 0
+                        // ||!approvalIsConfirmed
                       }
                       className="w-1/2 self-center mt-2"
                       onClick={() => {
                         setStakeDialogIsOpen(true);
-                        if (isApproval) {
+                        if (approvalIsConfirmed) {
                           stakeSubmit();
                         } else {
                           approvalSubmit();
@@ -474,13 +444,14 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
                       {!isApproval
                         ? "Approve"
                         : stakeIsPending
-                        ? "Confirming..."
-                        : "Stake token"}
+                          ? "Confirming..."
+                          : "Stake token"}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>Transaction Detail: </DialogHeader>
                     <DialogDescription className="flex flex-col gap-1 justify-center items-center">
+
                       {stakeIsConfirmed ? (
                         <div>
                           <span>Transaction successfully</span>

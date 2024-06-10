@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import Image from "next/image";
+import BorrowButton from "../ExecutingButton/BorrowButton";
+import RepayButton from "../ExecutingButton/RepayButton";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -59,17 +61,17 @@ export const columns: ColumnDef<BorrowingPool>[] = [
     cell: ({ row }) => {
       return (
         <div className="text-center text-lg font-bold opacity-70">
-          {row.getValue("debt")}
+          {parseFloat(row.getValue("debt")).toFixed(5)}
         </div>
       );
     },
   },
   {
     id: "actions",
-    cell: () => (
+    cell: ({ row }) => (
       <div className="flex flex-row gap-2 items-center">
-        <Button>Borrow</Button>
-        <Button>Repay</Button>
+        <BorrowButton pool={row.original} />
+        <RepayButton pool={row.original} />
       </div>
     ),
   },

@@ -176,13 +176,6 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
           ? ethers.parseEther(amountInToken ? amountInToken.toString() : "0")
           : ethers.parseEther("0");
     }
-    console.log({
-      address,
-      abi,
-      args,
-      functionName,
-      value,
-    });
     writeContract({
       address,
       abi,
@@ -191,7 +184,6 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
       value,
     });
   };
-  console.log(executingError);
 
   const sendTransactionSubmit = async () => {
     if (sendToken?.native && address) {

@@ -1,19 +1,22 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-
-// Hooks
-
 // Components
 import Order from "./order";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import ListProposal from "./listProposal";
+import { useChainId, useReadContract, useReadContracts } from "wagmi";
+import { getGovernorAddress } from "@/contracts/utils/getAddress";
+import { getGovernorAbi } from "@/contracts/utils/getAbis";
+import { ethers } from "ethers";
 
 const Proposal = () => {
   const [status, setStatus] = useState<string>("active");
   const [search, setSearch] = useState<string>("");
+  const [order, setOrder] = useState<string>("newest");
+
   return (
     <div className="flex flex-col items-center my-5 w-[1400px] min-h-[900px] bg-white border-2 rounded-xl py-10">
       {/* title */}
@@ -30,54 +33,34 @@ const Proposal = () => {
         <Tabs defaultValue="active" className="w-[1200px] flex flex-col gap-5">
           <div className="flex flex-row items-center justify-between">
             <TabsList>
-              <TabsTrigger
-                value="active"
-                onClick={() => {
-                  setStatus("active");
-                }}
-              >
+              <TabsTrigger value="active" onClick={() => setStatus("active")}>
                 Active
               </TabsTrigger>
-              <TabsTrigger
-                value="inQueue"
-                onClick={() => {
-                  setStatus("inQueue");
-                }}
-              >
-                In Queue
+              <TabsTrigger value="queued" onClick={() => setStatus("queued")}>
+                In Queued
               </TabsTrigger>
-              <TabsTrigger
-                value="passed"
-                onClick={() => {
-                  setStatus("passed");
-                }}
-              >
-                Passed
+              <TabsTrigger value="succeeded" onClick={() => setStatus("succeeded")}>
+                Succeeded
               </TabsTrigger>
-              <TabsTrigger
-                value="rejected"
-                onClick={() => {
-                  setStatus("rejected");
-                }}
-              >
-                Rejected
+              <TabsTrigger value="canceled" onClick={() => setStatus("canceled")}>
+                Canceled
+              </TabsTrigger>
+              <TabsTrigger value="defeated" onClick={() => setStatus("defeated")}>
+                Defeated
               </TabsTrigger>
             </TabsList>
             <div className="flex flex-row gap-5 justify-center items-center">
               <span className="opacity-40">Order by </span>
-              <Order />
+              <Order setOrder={setOrder} />
             </div>
           </div>
           <Input
             type="text"
-            placeholder="Search proposals"
-            onChange={(event: any) => {
-              setSearch(event.target.value);
-              console.log(event.target.value);
-            }}
+            placeholder="Search proposals by proposalId or Proposal Description"
+            onChange={(event: any) => setSearch(event.target.value)}
           />
           <TabsContent value={status}>
-            <ListProposal status={status} search={search} />
+            <ListProposal status={status} search={search} order={order} />
           </TabsContent>
         </Tabs>
       </div>

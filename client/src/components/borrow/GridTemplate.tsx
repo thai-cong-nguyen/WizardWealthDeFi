@@ -21,9 +21,8 @@ const GridTemplate = ({
   };
   return (
     <div
-      className={`border-3 border-black rounded-xl p-5 bg-white flex-wrap ${props} ${
-        !isShown ? "min-h-0" : ""
-      }`}
+      className={`flex justify-center flex-col border-3 border-black rounded-xl p-5 bg-white flex-wrap ${props} ${!isShown ? "min-h-0" : ""
+        }`}
     >
       {/* sub title */}
       <div className="flex flex-col gap-2 flex-wrap ">
@@ -34,8 +33,8 @@ const GridTemplate = ({
               className="flex flex-row items-center justify-center cursor-pointer opacity-70"
               onClick={onClickShowDetails}
             >
-              <div className="">{isShown ? "Hide" : "Show"}</div>
-              <div className="">{isShown ? <Minus /> : <Plus />}</div>
+              <span className="">{isShown ? "Hide" : "Show"}</span>
+              <span className="">{isShown ? <Minus /> : <Plus />}</span>
             </div>
           ) : (
             <></>

@@ -13,11 +13,11 @@ import WithdrawButton from "../ExecutingButton/WithdrawButton";
 // You can use a Zod schema here if you want.
 export type SupplyingPool = {
   id: string;
-  address: string;
+  address: `0x${string}`;
   name: string;
   symbol: string;
   balance: number;
-  collateral: boolean;
+  walletBalance: number;
 };
 
 export const columns: ColumnDef<SupplyingPool>[] = [
@@ -64,21 +64,7 @@ export const columns: ColumnDef<SupplyingPool>[] = [
     cell: ({ row }) => {
       return (
         <div className="text-center text-lg font-bold opacity-70">
-          {row.getValue("balance")}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "collaterals",
-    header: "Collateral",
-    cell: ({ row }) => {
-      return (
-        <div className="w-full">
-          <Switch
-            checked={row.getValue("collateral")}
-            onCheckedChange={() => {}}
-          />
+          {parseFloat(row.getValue("balance")).toFixed(5)}
         </div>
       );
     },
@@ -87,7 +73,9 @@ export const columns: ColumnDef<SupplyingPool>[] = [
     id: "actions",
     cell: ({ row }) => (
       <div className="flex flex-row gap-2 items-center">
-        <SupplyButton pool={row.original} />
+        <SupplyButton
+          pool={row.original}
+        />
         <WithdrawButton pool={row.original} />
       </div>
     ),

@@ -5,10 +5,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 import WithdrawDialog from "../Dialog/WithdrawDialog";
-import { WithdrawingPool } from "../Columns/YourSuppliesColumns";
+import { SupplyingPool } from "../Columns/YourSuppliesColumns";
 
 interface WithdrawButtonProps {
-  pool: WithdrawingPool;
+  pool: SupplyingPool;
 }
 
 const WithdrawButton = ({ pool }: WithdrawButtonProps) => {

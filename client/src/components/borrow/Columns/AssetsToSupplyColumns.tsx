@@ -22,11 +22,10 @@ import SupplyButton from "../ExecutingButton/SupplyButton";
 
 export type AssetsToSupplyPool = {
   id: string;
-  address: string;
+  address: `0x${string}`;
   name: string;
   symbol: string;
   walletBalance: number;
-  collateral: boolean;
 };
 
 export const columns: ColumnDef<AssetsToSupplyPool>[] = [
@@ -73,19 +72,8 @@ export const columns: ColumnDef<AssetsToSupplyPool>[] = [
     cell: ({ row }) => {
       return (
         <div className="text-center text-lg font-bold opacity-70">
-          {row.getValue("walletBalance")}
+          {parseFloat(row.getValue("walletBalance")).toFixed(5)}
         </div>
-      );
-    },
-  },
-  {
-    accessorKey: "collateral",
-    header: "Wallet Balance",
-    cell: ({ row }) => {
-      return row.getValue("collateral") ? (
-        <CheckIcon height={30} width={30} className="text-lime-600" />
-      ) : (
-        <MinusIcon height={30} width={30} />
       );
     },
   },
@@ -93,7 +81,9 @@ export const columns: ColumnDef<AssetsToSupplyPool>[] = [
     id: "actions",
     cell: ({ row }) => (
       <div className="flex flex-row gap-2 items-center">
-        <SupplyButton pool={row.original} />
+        <SupplyButton
+          pool={row.original}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">

@@ -13,16 +13,16 @@ const appName = 'Wizard Wealth DAO';
 
 // Create wagmiConfig
 
-export const config = createConfig({
-  chains: [
-    // mainnet, 
-    sepolia
-  ],
-  transports: {
-    // [mainnet.id]: http(`https://mainnet.infura.io/v3/${infuraApiKey}`),
-    [sepolia.id]: http(`https://sepolia.infura.io/v3/${infuraApiKey}`),
-  },
-})
+// export const config = createConfig({
+//   chains: [
+//     // mainnet, 
+//     sepolia
+//   ],
+//   transports: {
+//     // [mainnet.id]: http(`https://mainnet.infura.io/v3/${infuraApiKey}`),
+//     [sepolia.id]: http(`https://sepolia.infura.io/v3/${infuraApiKey}`),
+//   },
+// })
 
 export const wagmiConfig = getDefaultConfig({
   appName: appName,
