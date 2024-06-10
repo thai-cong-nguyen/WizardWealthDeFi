@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss"
 
 const config = {
+  mode: 'jit',
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -67,10 +68,21 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-out": {
+          from: {opacity: "1"},
+          to: {opacity: "0"}
+        },
+        "fade-in": {
+          from: {opacity: "0"},
+          to: {opacity: "1"}
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-out": "fadeOut 1s ease-in-out",
+        "fade-in": "fadeIn 1s ease-in-out",
+        "delayed-fade-in": "delay-150"
       },
       backgroundImage: {
         'navbar': "url('/navbar.jpg')",
@@ -78,6 +90,8 @@ const config = {
         'swap': "url('/2witches_exchange.jpg')",
         'staking': "url(/staking.jpg)",
         'logo': "url(/Logo.jpg)",
+        'borrowing': "url(/borrowing.jpg)",
+        'governance': "url(/proposal.jpg)"
       }
     },
   },

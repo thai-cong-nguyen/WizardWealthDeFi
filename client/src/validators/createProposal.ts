@@ -1,13 +1,13 @@
 import { z } from "zod";
+
+const argumentSchema = z.object({
+  name: z.string(),
+  value: z.string().min(1, { message: "Required" }),
+});
+
 export const createProposalSchema = z.object({
-    type: z.string(),
-    title: z.string().min(1, {
-        message: "Required"
-    }),
-    description: z.string().min(1, {
-        message: "Required"
-    }),
-    initialDeposited: z.preprocess((a) => parseFloat(z.string().parse(a)), z.coerce.number().positive("Initial Deposit is greater than 0").refine((val) => !Number.isNaN(val), {
-        message: "Required"
-      })),
+  target: z.string().min(1, { message: "Required" }),
+  calldata: z.string().min(1, { message: "Required" }),
+  arguments: z.array(argumentSchema).optional(),
+  description: z.string().min(1, { message: "Required" }),
 });

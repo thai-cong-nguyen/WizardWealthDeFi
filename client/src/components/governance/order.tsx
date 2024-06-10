@@ -10,29 +10,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const Order = () => {
-  const [orderBy, setOrderBy] = useState("most-recent");
+const Order = ({ setOrder }: { setOrder: (order: string) => void }) => {
+  const [orderBy, setOrderBy] = useState("newest");
+
+  const handleOrderChange = (value: string) => {
+    setOrderBy(value);
+    setOrder(value);
+  };
+
   return (
     <div>
       <Select
         name="OrderBy"
-        defaultValue="most-recent"
+        defaultValue="newest"
         value={orderBy}
-        onValueChange={setOrderBy}
+        onValueChange={handleOrderChange}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="most-recent">Most Recent</SelectItem>
           <SelectItem value="newest">Newest</SelectItem>
           <SelectItem value="oldest">Oldest</SelectItem>
-          <SelectItem value="highest-participation">
-            Highest Participation
-          </SelectItem>
-          <SelectItem value="lowest-participation">
-            Lowest Participation
-          </SelectItem>
         </SelectContent>
       </Select>
     </div>
