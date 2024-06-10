@@ -23,6 +23,6 @@ export const wagmiConfig = getDefaultConfig({
     [sepolia.id]: http(`https://sepolia.infura.io/v3/${infuraApiKey}`),
   },
   storage: createStorage({
-    storage: localStorage,
+    storage: cookieStorage,
   }),
 })
