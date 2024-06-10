@@ -4,16 +4,11 @@ import { useRouter } from "next/navigation";
 // Components
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Proposal } from "@/utils/proposal";
 import { ChevronRight } from "lucide-react";
-import { Separator } from "../ui/separator";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
-import { Progress } from "../ui/progress";
 import axios from "axios";
 import { useBlock, useChainId, useReadContract, useReadContracts, useWatchContractEvent } from "wagmi";
 import { getGovernorAddress, getWizardWealthAddress } from "@/contracts/utils/getAddress";
 import { getGovernorAbi, getWizardWealthAbi } from "@/contracts/utils/getAbis";
-import { ethers } from "ethers";
 import VotesAndQuorum from "./votesAndQuorum";
 
 export const renderProposalStatus = (param: Number) => {

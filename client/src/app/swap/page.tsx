@@ -3,7 +3,7 @@ import React from "react";
 // Components
 import SwapWrapper from "@/components/swap/swapWrapper";
 
-const Swapping = ({ children }: { children: React.ReactNode }) => {
+const Swapping = () => {
   return (
     <main className="bg-swap bg-no-repeat bg-center bg-cover bg-fixed  h-screen relative">
       <div className="absolute inset-0 bg-white bg-opacity-20 w-full" />

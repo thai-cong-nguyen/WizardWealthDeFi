@@ -120,59 +120,59 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
           ? "deposit"
           : outToken?.native == true &&
             inToken?.address == getWETHAddress(chainId)
-          ? "withdraw"
-          : inToken?.native
-          ? "swapExactETHForTokens"
-          : outToken?.native
-          ? "swapExactTokensForETH"
-          : "swapExactTokensForTokens";
+            ? "withdraw"
+            : inToken?.native
+              ? "swapExactETHForTokens"
+              : outToken?.native
+                ? "swapExactTokensForETH"
+                : "swapExactTokensForTokens";
       abi =
         inToken?.native == true && outToken?.address == getWETHAddress(chainId)
           ? getWETHAbi()
           : outToken?.native == true &&
             inToken?.address == getWETHAddress(chainId)
-          ? getWETHAbi()
-          : getSwapAbi();
+            ? getWETHAbi()
+            : getSwapAbi();
       address =
         inToken?.native == true && outToken?.address == getWETHAddress(chainId)
           ? getWETHAddress(chainId)
           : outToken?.native == true &&
             inToken?.address == getWETHAddress(chainId)
-          ? getWETHAddress(chainId)
-          : getSwapAddress(chainId);
+            ? getWETHAddress(chainId)
+            : getSwapAddress(chainId);
       args =
         inToken?.native == true && outToken?.address == getWETHAddress(chainId)
           ? []
           : outToken?.native == true &&
             inToken?.address == getWETHAddress(chainId)
-          ? [ethers.parseEther(amountInToken ? amountInToken.toString() : "0")]
-          : inToken?.native
-          ? [
-              outToken?.address,
-              amountOutMin,
-              account.address,
-              Date.now() + deadline * 60 * 1000,
-            ]
-          : outToken?.native
-          ? [
-              inToken?.address,
-              ethers.parseEther(amountInToken ? amountInToken.toString() : "0"),
-              amountOutMin,
-              account.address,
-              Date.now() + deadline * 60 * 1000,
-            ]
-          : [
-              inToken?.address,
-              outToken?.address,
-              ethers.parseEther(amountInToken ? amountInToken.toString() : "0"),
-              amountOutMin,
-              account.address,
-              Date.now() + deadline * 60 * 1000,
-            ];
+            ? [ethers.parseEther(amountInToken ? amountInToken.toString() : "0")]
+            : inToken?.native
+              ? [
+                outToken?.address,
+                amountOutMin,
+                account.address,
+                Date.now() + deadline * 60 * 1000,
+              ]
+              : outToken?.native
+                ? [
+                  inToken?.address,
+                  ethers.parseEther(amountInToken ? amountInToken.toString() : "0"),
+                  amountOutMin,
+                  account.address,
+                  Date.now() + deadline * 60 * 1000,
+                ]
+                : [
+                  inToken?.address,
+                  outToken?.address,
+                  ethers.parseEther(amountInToken ? amountInToken.toString() : "0"),
+                  amountOutMin,
+                  account.address,
+                  Date.now() + deadline * 60 * 1000,
+                ];
       value =
         (inToken?.native == true &&
           outToken?.address == getWETHAddress(chainId)) ||
-        inToken?.native
+          inToken?.native
           ? ethers.parseEther(amountInToken ? amountInToken.toString() : "0")
           : ethers.parseEther("0");
     }
@@ -399,8 +399,8 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                     <span className="font-bold">
                       {((amountOutToken
                         ? parseFloat(
-                            ethers.formatEther(amountOutToken.toString())
-                          )
+                          ethers.formatEther(amountOutToken.toString())
+                        )
                         : 0) *
                         (100 - slippage)) /
                         100}
@@ -412,15 +412,14 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                   width={40}
                   height={40}
                   src="/ethereum.png"
-                  alt={outToken ? outToken.symbol : ""}
+                  alt={outToken?.symbol || ""}
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row justify-between items-center">
                   <span>Rate</span>
-                  <span>{`${1} ${inToken ? inToken.symbol : ""} = ${4000} ${
-                    outToken ? outToken.symbol : ""
-                  }`}</span>
+                  <span>{`${1} ${inToken ? inToken.symbol : ""} = ${4000} ${outToken ? outToken.symbol : ""
+                    }`}</span>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                   <span>Price impact</span>
@@ -460,7 +459,7 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                         width={40}
                         height={40}
                         src="/ethereum.png"
-                        alt={sendToken ? sendToken.symbol : ""}
+                        alt={sendToken?.symbol || ""}
                       />
                       <span>{sendToken ? sendToken.symbol : ""}</span>
                     </div>
@@ -492,16 +491,15 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
       <Dialog open={isOpenLoadingDialog} onOpenChange={setIsOpenLoadingDialog}>
         <DialogContent>
           {isConfirming ? (
-            <div className="flex flex-col gap-5 mt-3 justify-center items-center gap-2">
+            <div className="flex flex-col gap-5 mt-3 justify-center items-center">
               <span>Waiting for confirmation...</span>
             </div>
           ) : isConfirmed ? (
-            <div className="flex flex-col gap-5 mt-3 justify-center items-center gap-2">
+            <div className="flex flex-col gap-5 mt-3 justify-center items-center">
               <Button className="w-full" type="submit">
                 <Link
-                  href={`https://sepolia.etherscan.io/tx/${
-                    isSwap ? hash : hashSendTransaction
-                  }`}
+                  href={`https://sepolia.etherscan.io/tx/${isSwap ? hash : hashSendTransaction
+                    }`}
                   target="_blank"
                 >
                   Transaction
@@ -510,7 +508,7 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
               {isConfirmed && <span>Transaction confirmed.</span>}
             </div>
           ) : isReverted ? (
-            <div className="flex flex-col gap-5 mt-3 justify-center items-center gap-2">
+            <div className="flex flex-col gap-5 mt-3 justify-center items-center">
               <Button className="w-full" type="submit">
                 <Link
                   href={`https://sepolia.etherscan.io/tx/${hash}`}
@@ -519,11 +517,6 @@ const ExecutingButton: React.FC<ExecutingButtonProps> = ({
                   Transaction
                 </Link>
               </Button>
-              {error && (
-                <div>
-                  Error: {(error as BaseError).shortMessage || error.message}
-                </div>
-              )}
             </div>
           ) : (
             <div></div>

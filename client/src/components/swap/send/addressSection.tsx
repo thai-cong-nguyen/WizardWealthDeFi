@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 
 interface SendSectionProps {
-  address?: string | undefined;
+  address?: `0x${string}` | undefined;
   onChangeAddress: (address: `0x${string}` | undefined) => void;
 }
 
@@ -10,7 +10,7 @@ const AddressSection: React.FC<SendSectionProps> = ({
   address,
   onChangeAddress,
 }) => {
-  const handleAddressChange = (address: string) => {
+  const handleAddressChange = (address: any) => {
     onChangeAddress(address);
   };
   return (

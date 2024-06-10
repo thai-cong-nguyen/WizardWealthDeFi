@@ -54,7 +54,7 @@ const CardStaking = ({ token, key }: CardStakingProps) => {
   return (
     <Card className="flex flex-col gap-5 justify-center lg:min-w-[400px] p-10 bg-white rounded-xl flex-wrap hover:translate-y-2 transition">
       <div className="flex flex-row items-center justify-between flex-wrap">
-        <Image width={80} height={80} src="/ethereum.png" alt={token.name} />
+        <Image width={80} height={80} src="/ethereum.png" alt={token.name || ""} />
         <span className="font-bold text-2xl">{token.symbol}</span>
       </div>
       <div className="flex flex-row items-center justify-between flex-wrap">
@@ -92,7 +92,7 @@ const CardStaking = ({ token, key }: CardStakingProps) => {
                 width={50}
                 height={50}
                 src="/ethereum.png"
-                alt={token.name}
+                alt={token.name || ""}
               />
               <span className="text-2xl">Stake {token.symbol}</span>
             </>
@@ -107,7 +107,7 @@ const CardStaking = ({ token, key }: CardStakingProps) => {
                       width={50}
                       height={50}
                       src="/ethereum.png"
-                      alt={token.name}
+                      alt={token.name || ""}
                     />
                     <span className="font-bold text-xl">{token.symbol}</span>
                   </div>
@@ -230,7 +230,7 @@ const CardStaking = ({ token, key }: CardStakingProps) => {
                 width={50}
                 height={50}
                 src="/ethereum.png"
-                alt={token.name}
+                alt={token.name || ""}
               />
               <span className="text-2xl">Withdraw {token.symbol}</span>
             </>
@@ -247,7 +247,7 @@ const CardStaking = ({ token, key }: CardStakingProps) => {
                       width={50}
                       height={50}
                       src="/ethereum.png"
-                      alt={token.name}
+                      alt={token.name || ""}
                     />
                     <span className="font-bold text-xl">{token.symbol}</span>
                   </div>
@@ -364,7 +364,7 @@ const CardStaking = ({ token, key }: CardStakingProps) => {
                 width={50}
                 height={50}
                 src="/ethereum.png"
-                alt={token.name}
+                alt={token.name || ""}
               />
               <span className="text-2xl">Earn {token.symbol}</span>
             </>
@@ -379,7 +379,7 @@ const CardStaking = ({ token, key }: CardStakingProps) => {
                       width={50}
                       height={50}
                       src="/ethereum.png"
-                      alt={token.name}
+                      alt={token.name || ""}
                     />
                     <span className="font-bold text-xl">{token.symbol}</span>
                   </div>
