@@ -4,7 +4,7 @@ export const fetchTokensData = async (tokenAddresses: any[]) => {
     try {
       const detailTokens = await axios({
         method: "post",
-        url: "http://localhost:3001/api/token/contracts",
+        url: "https://wizardwealthdefi.onrender.com/api/token/contracts",
         headers: { "Content-Type": "application/json" },
         data: { contractAddresses: tokenAddresses, chainId: "0xaa36a7" },
       });
@@ -21,7 +21,7 @@ export const fetchTokensData = async (tokenAddresses: any[]) => {
     try {
       const detailToken = await axios({
         method: "post",
-        url: "http://localhost:3001/api/token/contract",
+        url: "https://wizardwealthdefi.onrender.com/api/token/contract",
         headers: { "Content-Type": "application/json" },
         data: { contractAddress: tokenAddress, chainId: "0xaa36a7" },
       });

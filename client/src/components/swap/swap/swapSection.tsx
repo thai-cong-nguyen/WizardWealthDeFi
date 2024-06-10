@@ -68,7 +68,7 @@ const SwapSection: React.FC<SwapSectionProps> = ({
   useEffect(() => {
     axios({
       method: "post",
-      url: "http://localhost:3001/api/token/contract",
+      url: "https://wizardwealthdefi.onrender.com/api/token/contract",
       headers: { "Content-Type": "application/json" },
       data: { contractAddress: searchQuery, chainId: "0xaa36a7" },
     }).then(({ data }) => {
@@ -86,9 +86,8 @@ const SwapSection: React.FC<SwapSectionProps> = ({
       <Label className="text-lg">{isInToken ? "You pay" : "You receive"}</Label>
       <div className="flex flex-row justify-between">
         <Input
-          className={`border-none bg-transparent p-0 outline-none text-2xl focus-visible:ring-0 focus-visible:ring-offset-0 -webkit-appearance-none  ${
-            isPending && !isInToken ? "opacity-60" : ""
-          }`}
+          className={`border-none bg-transparent p-0 outline-none text-2xl focus-visible:ring-0 focus-visible:ring-offset-0 -webkit-appearance-none  ${isPending && !isInToken ? "opacity-60" : ""
+            }`}
           type="number"
           inputMode="decimal"
           placeholder="0"
