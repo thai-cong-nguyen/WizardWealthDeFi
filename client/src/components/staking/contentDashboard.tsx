@@ -137,7 +137,7 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
     isPending: stakeIsConfirming,
     isSuccess: stakeIsConfirmed,
   } = useWaitForTransactionReceipt({
-    confirmations: 10,
+    confirmations: 3,
     hash: stakeHash,
   });
 
@@ -153,7 +153,7 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
     isPending: unStakeIsConfirming,
     isSuccess: unStakeIsConfirmed,
   } = useWaitForTransactionReceipt({
-    confirmations: 10,
+    confirmations: 3,
     hash: unStakeHash,
   });
 
@@ -170,7 +170,7 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
     isPending: earnStakeIsConfirming,
     isSuccess: earnStakeIsConfirmed,
   } = useWaitForTransactionReceipt({
-    confirmations: 10,
+    confirmations: 3,
     hash: earnIsSuccess ? earnHash : undefined,
   });
 
@@ -185,7 +185,7 @@ const ContentDashboard = ({ props }: ContentDashboardProps) => {
     isPending: approvalIsConfirming,
     isSuccess: approvalIsConfirmed,
   } = useWaitForTransactionReceipt({
-    confirmations: 10,
+    confirmations: 3,
     hash: approvalHash,
   });
 
