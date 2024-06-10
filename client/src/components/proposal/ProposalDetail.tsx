@@ -64,10 +64,9 @@ const ProposalDetail = ({ proposalDetail, proposalStatus, voteCast }: ProposalDe
     const handleCopyText = (textToCopy: any) => {
         navigator.clipboard.writeText(textToCopy)
             .then(() => {
-                process.exit(0);
             })
             .catch((error) => {
-                process.exit(1);
+                console.error('Error copying text: ', error);
             });
     };
 

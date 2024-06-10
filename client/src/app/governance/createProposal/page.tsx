@@ -101,10 +101,11 @@ const CreateProposal = () => {
     }
   }, [selectedFunction]);
 
+
+
   function onSubmit(values: Input) {
     setLoadingDialogIsOpen(true);
     const encodedFunction = new ethers.Interface(abi).encodeFunctionData(selectedFunction.signature, values?.arguments?.map((arg) => arg.value, []));
-
     writeContract({
       abi: getGovernorAbi(),
       address: getGovernorAddress(chain),

@@ -63,9 +63,12 @@ const ExecutingButton = ({ proposalDetail, proposalId }: ExecutingButtonProps) =
             ...governorContract,
             functionName: "execute",
             args: [(proposalData as any[])[0], (proposalData as any[])[1], (proposalData as any[])[2], (proposalData as any[])[3]],
-            value: ethers.parseEther("0.01"),
+            // args: [proposalId],
+            // value: ethers.parseEther("0"),
         });
     }
+
+    console.log(executingError);
 
 
     return (
