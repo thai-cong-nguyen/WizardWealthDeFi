@@ -18,7 +18,7 @@ const Proposal = () => {
   const [order, setOrder] = useState<string>("newest");
 
   return (
-    <div className="flex flex-col items-center my-5 w-[1400px] min-h-[900px] bg-white border-2 rounded-xl py-10">
+    <div className="flex flex-col gap-3 items-center my-5 w-[1400px] min-h-[900px] bg-white border-2 rounded-xl py-10">
       {/* title */}
       <div className="flex flex-col gap-5 justify-center items-center">
         <span className="text-3xl font-bold">
@@ -33,14 +33,11 @@ const Proposal = () => {
         <Tabs defaultValue="active" className="w-[1200px] flex flex-col gap-5">
           <div className="flex flex-row items-center justify-between">
             <TabsList>
+              <TabsTrigger value="pending" onClick={() => setStatus("pending")}>
+                Pending
+              </TabsTrigger>
               <TabsTrigger value="active" onClick={() => setStatus("active")}>
                 Active
-              </TabsTrigger>
-              <TabsTrigger value="queued" onClick={() => setStatus("queued")}>
-                In Queued
-              </TabsTrigger>
-              <TabsTrigger value="succeeded" onClick={() => setStatus("succeeded")}>
-                Succeeded
               </TabsTrigger>
               <TabsTrigger value="canceled" onClick={() => setStatus("canceled")}>
                 Canceled
@@ -48,6 +45,19 @@ const Proposal = () => {
               <TabsTrigger value="defeated" onClick={() => setStatus("defeated")}>
                 Defeated
               </TabsTrigger>
+              <TabsTrigger value="succeeded" onClick={() => setStatus("succeeded")}>
+                Succeeded
+              </TabsTrigger>
+              <TabsTrigger value="queued" onClick={() => setStatus("queued")}>
+                In Queued
+              </TabsTrigger>
+              <TabsTrigger value="expired" onClick={() => setStatus("expired")}>
+                Expired
+              </TabsTrigger>
+              <TabsTrigger value="executed" onClick={() => setStatus("executed")}>
+                Executed
+              </TabsTrigger>
+
             </TabsList>
             <div className="flex flex-row gap-5 justify-center items-center">
               <span className="opacity-40">Order by </span>

@@ -68,7 +68,7 @@ const SendSection: React.FC<SendSectionProps> = ({
   useEffect(() => {
     axios({
       method: "post",
-      url: "http://localhost:3001/api/token/contract",
+      url: "https://wizardwealthdefi.onrender.com/api/token/contract",
       headers: { "Content-Type": "application/json" },
       data: { contractAddress: searchQuery, chainId: "0xaa36a7" },
     }).then(({ data }) => {

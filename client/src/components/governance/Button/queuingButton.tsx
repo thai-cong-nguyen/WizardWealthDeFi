@@ -13,17 +13,18 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import LoadingTransactionHash from '@/components/LoadingTransactionHash';
 import { getGovernorAbi, getWizardWealthAbi } from "@/contracts/utils/getAbis";
 import { getGovernorAddress, getWizardWealthAddress } from "@/contracts/utils/getAddress";
 
 interface QueuingButtonProps {
     proposalDetail: any;
+    proposalId: any;
 }
 
 
-const QueuingButton = ({ proposalDetail }: QueuingButtonProps) => {
+const QueuingButton = ({ proposalDetail, proposalId }: QueuingButtonProps) => {
     const account = useAccount();
     const chain = useChainId();
     const [loadingDialogIsOpen, setLoadingDialogIsOpen] = useState(false);
@@ -34,9 +35,19 @@ const QueuingButton = ({ proposalDetail }: QueuingButtonProps) => {
     } as const;
 
     const {
+        data: proposalData,
+        isPending: proposalIsPending,
+    } = useReadContract({
+        ...governorContract,
+        functionName: "proposalDetails",
+        args: [proposalId]
+    });
+
+    const {
         data: queuingHash,
         isPending: queuingIsPending,
         isError: queuingIsError,
+        error: queuingError,
         writeContract: queuingWriteContract,
     } = useWriteContract();
 
@@ -50,7 +61,7 @@ const QueuingButton = ({ proposalDetail }: QueuingButtonProps) => {
         queuingWriteContract({
             ...governorContract,
             functionName: "queue",
-            args: [proposalDetail.proposalId]
+            args: [(proposalData as any[])[0], (proposalData as any[])[1], (proposalData as any[])[2], (proposalData as any[])[3]],
         });
     }
 

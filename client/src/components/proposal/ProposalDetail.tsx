@@ -14,6 +14,7 @@ import DelegateButton from '../governance/Button/delegateButton';
 import ExecutingButton from '../governance/Button/executingButton';
 import QueuingButton from '../governance/Button/queuingButton';
 import VotesAndQuorum from '../governance/votesAndQuorum';
+import CancelButton from '../governance/Button/cancelButton';
 
 
 interface ProposalDetailProps {
@@ -84,8 +85,8 @@ const ProposalDetail = ({ proposalDetail, proposalStatus, voteCast }: ProposalDe
                     <div className="flex flex-row items-center gap-2">
                         <DelegateButton />
                         <VoteDialog proposalId={propsalId} disabledButton={proposalStatus != 1} proposalStatus={proposalStatus} />
-                        {proposalStatus == 4 && <QueuingButton proposalDetail={proposalDetail} />}
-                        {proposalStatus == 5 && <ExecutingButton proposalDetail={proposalDetail} />}
+                        {proposalDetail.proposer.toString().toLowerCase() == account.address?.toString().toLowerCase() ? <CancelButton proposalId={propsalId} proposalDetail={proposalDetail} /> : <></>}
+                        {proposalStatus == 4 ? <QueuingButton proposalId={propsalId} proposalDetail={proposalDetail} /> : proposalStatus == 5 ? <ExecutingButton proposalId={propsalId} proposalDetail={proposalDetail} /> : <></>}
                     </div>
                     <div className="flex flex-row gap-2 items-center">
                         <span>Voting power:</span>

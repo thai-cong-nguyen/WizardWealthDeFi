@@ -27,6 +27,8 @@ export const renderProposalStatus = (param: Number) => {
       return "Queued";
     case 6:
       return "Expired";
+    case 7:
+      return "Executed";
     default:
       return "Unknown";
   }
